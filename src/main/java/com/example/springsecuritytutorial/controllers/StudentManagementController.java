@@ -1,4 +1,4 @@
-package com.example.springsecuritytutorial.Controllers;
+package com.example.springsecuritytutorial.controllers;
 
 import com.example.springsecuritytutorial.student.Student;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,37 +1,37 @@
 package com.example.springsecuritytutorial.security;
 
+import com.example.springsecuritytutorial.auth.ApplicationUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import java.util.Set;
-
-import static com.example.springsecuritytutorial.security.ApplicationUserPermission.COURSE_WRITE;
-import static com.example.springsecuritytutorial.security.ApplicationUserRole.*;
+import static com.example.springsecuritytutorial.security.ApplicationUserRole.STUDENT;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true
-        /*securedEnabled = true,
+@EnableGlobalMethodSecurity(prePostEnabled = true/*securedEnabled = true,
         jsr250Enabled = true
         */ )
 public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+  private final ApplicationUserService applicationUserService;
+
+  public ApplicationSecurityConfiguration(ApplicationUserService applicationUserService) {
+    this.applicationUserService = applicationUserService;
+  }
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
-    http.csrf().disable()
+    http.csrf()
+        .disable()
         .authorizeRequests()
         .antMatchers("/", "index", "/css/*", "/js/*")
         .permitAll()
@@ -55,7 +55,22 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
     return new BCryptPasswordEncoder(10);
   }
 
+  //From a DB
   @Bean
+  public DaoAuthenticationProvider daoAuthenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setPasswordEncoder(encoder());
+    provider.setUserDetailsService(applicationUserService);
+    return provider;
+  }
+
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.authenticationProvider(daoAuthenticationProvider());
+  }
+
+  // In Memory
+  /*@Bean
   @Override
   protected UserDetailsService userDetailsService() {
     UserDetails garo = User.builder()
@@ -80,5 +95,5 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
             .build();
 
     return new InMemoryUserDetailsManager(garo, haigaz, alice);
-  }
+  }*/
 }
