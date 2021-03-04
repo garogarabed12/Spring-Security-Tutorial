@@ -18,23 +18,6 @@ public class ApplicationUser implements UserDetails {
   private final boolean isCredentialsNonExpired;
   private final boolean isEnabled;
 
-  /*public ApplicationUser(
-      List<? extends GrantedAuthority> grantedAuthorities,
-      String password,
-      String username,
-      boolean isAccountNonExpired,
-      boolean isAccountNonLocked,
-      boolean isCredentialsNonExpired,
-      boolean isEnabled) {
-    this.grantedAuthorities = grantedAuthorities;
-    this.password = password;
-    this.username = username;
-    this.isAccountNonExpired = isAccountNonExpired;
-    this.isAccountNonLocked = isAccountNonLocked;
-    this.isCredentialsNonExpired = isCredentialsNonExpired;
-    this.isEnabled = isEnabled;
-  }*/
-
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return grantedAuthorities;
